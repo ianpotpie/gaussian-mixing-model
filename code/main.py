@@ -41,7 +41,7 @@ def main():
         plt.scatter(gmm.means[j][0], gmm.means[j][1], color="black")
     plt.show()
 
-    # draws the voronoi regions of the mixing space
+    # draws the decision regions of the mixing space
     labels = np.argmax(soft_labels, axis=2)
     plt.pcolormesh(x_mesh, y_mesh, labels, shading="auto")
     plt.scatter(X[:, 0], X[:, 1], facecolors="none", edgecolors="grey")
