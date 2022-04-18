@@ -7,7 +7,7 @@ colors = ['b', 'g', 'r', 'c', 'm', 'y', 'w', 'b']
 maps = ['Greys', 'Purples', 'Blues', 'Greens', 'Oranges', 'Reds',
         'YlOrBr', 'YlOrRd', 'OrRd', 'PuRd', 'RdPu', 'BuPu',
         'GnBu', 'PuBu', 'YlGnBu', 'PuBuGn', 'BuGn', 'YlGn']
-epochs = 100
+epochs = 50
 
 
 def main():
@@ -26,27 +26,28 @@ def main():
     gmm = GaussianMixtureModel(k)
     gmm.train(X, epochs)
 
-    # creates a mesh over the domain
+    # creates a mesh over the domain (projects dimensions >2 down to 2)
     x_domain = np.linspace(np.min(X[:, 0]) - 0.1, np.max(X[:, 0]) + 0.1, 200)
     y_domain = np.linspace(np.min(X[:, 1]) - 0.1, np.max(X[:, 1]) + 0.1, 200)
     x_mesh, y_mesh = np.meshgrid(x_domain, y_domain)
-    points = np.array([x_mesh.flatten(), y_mesh.flatten()]).T
-    soft_labels = gmm.predict(points).reshape(x_mesh.shape[0], x_mesh.shape[1], -1)
+    n_dims = X.shape[1]
+    points = np.pad(np.array([x_mesh.flatten(), y_mesh.flatten()]).T, [[0, 0], [0, n_dims - 2]])
 
     # draws the contours of the distributions
-    for j in range(k):
-        plt.contourf(x_mesh, y_mesh, soft_labels[:, :, j], cmap=maps[j + 1], alpha=1 / (j + 1))
+    soft_labels = gmm.predict(points).reshape(x_mesh.shape[0], x_mesh.shape[1], -1)
+    for k in range(k):
+        plt.contourf(x_mesh, y_mesh, soft_labels[:, :, k], cmap=maps[k + 1], alpha=1 / (k + 1))
     plt.scatter(X[:, 0], X[:, 1], facecolors="none", edgecolors="grey")
-    for j in range(k):
-        plt.scatter(gmm.means[j][0], gmm.means[j][1], color="black")
+    for k in range(k):
+        plt.scatter(gmm.means[k][0], gmm.means[k][1], color="black")
     plt.show()
 
     # draws the decision regions of the mixing space
     labels = np.argmax(soft_labels, axis=2)
     plt.pcolormesh(x_mesh, y_mesh, labels, shading="auto")
     plt.scatter(X[:, 0], X[:, 1], facecolors="none", edgecolors="grey")
-    for j in range(k):
-        plt.scatter(gmm.means[j][0], gmm.means[j][1], color="black")
+    for k in range(k):
+        plt.scatter(gmm.means[k][0], gmm.means[k][1], color="black")
     plt.show()
 
 

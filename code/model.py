@@ -73,11 +73,11 @@ class GaussianMixtureModel:
         prob_k_given_x = np.zeros((n_examples, self.k))
         for i in range(n_examples):
             x, prob_x = X[i], 0
-            for j in range(self.k):
-                prob_k, mean_k, cov_k = self.priors[j], self.means[j], self.covars[j]
+            for k in range(self.k):
+                prob_k, mean_k, cov_k = self.priors[k], self.means[k], self.covars[k]
                 prob_x_given_k = multivariate_normal(mean_k, cov_k, x)  # density of x given it is from distribution k
-                prob_k_given_x[i][j] = prob_k * prob_x_given_k  # bayes rule, but missing the denominator P(X=x)
-                prob_x += prob_k_given_x[i][j]
+                prob_k_given_x[i][k] = prob_k * prob_x_given_k  # bayes rule, but missing the denominator P(X=x)
+                prob_x += prob_k_given_x[i][k]
 
             prob_k_given_x[i] /= (prob_x + eps)  # here we complete bayes rule with P(X=x)
 
